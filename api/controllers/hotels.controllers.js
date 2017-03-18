@@ -1,6 +1,5 @@
 var dbconn = require('../data/dbconnection.js')
 var ObjectId = require('mongodb').ObjectID
-var hotelData = require('../data/hotel-data.json')
 
 module.exports.hotelsGetAll = function (req, res) {
   var db = dbconn.get()
@@ -22,6 +21,10 @@ module.exports.hotelsGetAll = function (req, res) {
     .skip(offset)
     .limit(count)
     .toArray(function (err, docs) {
+      if (err) {
+        console.log('Hotels get all query failed')
+        return
+      }
       console.log('Found hotels', docs)
       res
         .status(200)
@@ -40,6 +43,10 @@ module.exports.hotelsGetOne = function (req, res) {
     .findOne({
       _id: ObjectId(hotelId)
     }, function (err, doc) {
+      if (err) {
+        console.log('Hotels get one query failed')
+        return
+      }
       res
         .status(200)
         .json(
