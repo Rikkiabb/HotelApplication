@@ -7,9 +7,28 @@ var runGeoQuery = function (req, res) {
 
   // A geoJSON point
   var point = {
-    type: 'Point'
+    type: 'Point',
     coordinates: [lng, lat]
   }
+
+  var geoOptions = {
+    spherical: true,
+    maxDistance: 2000,
+    num: 5
+  }
+
+  Hotel
+    .geoNear(point, geoOptions, function (err, results, stats) {
+      if (err) {
+        console.log('Error with geo query')
+        return
+      }
+      console.log('Geo results', results)
+      console.log('Geo stats', stats)
+      res
+        .status(200)
+        .json(results)
+    })
 }
 
 module.exports.hotelsGetAll = function (req, res) {
