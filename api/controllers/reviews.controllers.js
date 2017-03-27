@@ -10,15 +10,26 @@ module.exports.reviewsGetAll = function (req, res) {
     .findById(hotelId)
     .select('reviews')
     .exec(function (err, doc) {
+      var response = {
+        status: 200,
+        message: []
+      }
       if (err) {
-        console.log('Reviews get all query failed')
-        return
+        console.log('Error finding hotel')
+        response.status = 500
+        response.message = err
+      } else if (!doc) {
+        console.log('Hotel id not found in database', hotelId)
+        response.status = 404
+        response.message = {
+          'message': 'Hotel ID not found ' + hotelId
+        }
+      } else {
+        response.message = doc.reviews ? doc.reviews : []
       }
       res
-        .status(200)
-        .json(
-          doc.reviews
-        )
+        .status(response.status)
+        .json(response.message)
     })
 }
 
@@ -32,15 +43,33 @@ module.exports.reviewsGetOne = function (req, res) {
     .findById(hotelId)
     .select('reviews')
     .exec(function (err, hotel) {
-      if (err) {
-        console.log('Reviews get one query failed')
-        return
+      var response = {
+        status: 200,
+        message: {}
       }
-      var review = hotel.reviews.id(reviewId)
+      if (err) {
+        console.log('Error finding hotel')
+        response.status = 500
+        response.message = err
+      } else if (!hotel) {
+        console.log('Hotel id not found in database', hotelId)
+        response.status = 404
+        response.message = {
+          'message': 'Hotel ID not found ' + hotelId
+        }
+      } else {
+        // Get the review
+        response.message = hotel.reviews.id(reviewId)
+        // If the review doesn't exist Mongoose returns null
+        if (!response.message) {
+          response.status = 404
+          response.message = {
+            'message': 'Review ID not found ' + reviewId
+          }
+        }
+      }
       res
-        .status(200)
-        .json(
-          review
-        )
+        .status(response.status)
+        .json(response.message)
     })
 }
