@@ -1,9 +1,25 @@
 var mongoose = require('mongoose')
 var Hotel = mongoose.model('Hotel')
 
+var runGeoQuery = function (req, res) {
+  var lng = parseFloat(req.query.lng)
+  var lat = parseFloat(req.query.lat)
+
+  // A geoJSON point
+  var point = {
+    type: 'Point'
+    coordinates: [lng, lat]
+  }
+}
+
 module.exports.hotelsGetAll = function (req, res) {
   var offset = 0
   var count = 5
+
+  if (req.query && req.query.lat && req.query.lng) {
+    runGeoQuery(req, res)
+    return
+  }
 
   if (req.query && req.query.offset) {
     offset = parseInt(req.query.offset, 10)
